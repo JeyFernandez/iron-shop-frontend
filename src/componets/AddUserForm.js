@@ -1,156 +1,171 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Formulario.css";
 
-const Formulario = () => {
-  const [productos, setProductos] = useState([]);
-  const [nombre, setNombre] = useState("");
-  const [detalles, setDetalles] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [precio, setPrecio] = useState("");
-  const [stock, setStock] = useState("");
-  const [editarIndex, setEditarIndex] = useState(null);
+const Form = () => {
+  const [clients, setClients] = useState([]);
+  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [direction, setDirection] = useState("");
+  const [email, setEmail] = useState("");
+  const [dni, setDni] = useState("");
+  const [editingIndex, setEditingIndex] = useState(null);
 
-  const handleAgregarProducto = (e) => {
+  useEffect(() => {
+    fetch('http://localhost:3001/client')
+      .then(response => response.json())
+      .then(data => setClients(data))
+      .catch(error => console.error(error));
+  }, []);
+
+  const handleAddClient = (e) => {
     e.preventDefault();
 
     if (
-      nombre.trim() === "" ||
-      detalles.trim() === "" ||
-      categoria.trim() === "" ||
-      precio.trim() === "" ||
-      stock.trim() === ""
+      name.trim() === "" ||
+      lastName.trim() === "" ||
+      direction.trim() === "" ||
+      email.trim() === "" ||
+      dni.trim() === ""
     ) {
       alert("Por favor, completa todos los campos.");
       return;
     }
 
-    if (editarIndex !== null) {
-      const productosActualizados = [...productos];
-      productosActualizados[editarIndex] = {
-        nombre,
-        detalles,
-        categoria,
-        precio,
-        stock,
+    if (editingIndex !== null) {
+      const updatedClients = [...clients];
+      updatedClients[editingIndex] = {
+        id: clients[editingIndex].id,
+        name,
+        lastName,
+        direction,
+        email,
+        dni,
       };
-      setProductos(productosActualizados);
-      setEditarIndex(null);
+      setClients(updatedClients);
+      setEditingIndex(null);
     } else {
-      const nuevoProducto = {
-        nombre,
-        detalles,
-        categoria,
-        precio,
-        stock,
+      const newClient = {
+        name,
+        lastName,
+        direction,
+        email,
+        dni,
       };
 
-      setProductos([...productos, nuevoProducto]);
+      setClients([...clients, newClient]);
     }
 
-    limpiarFormulario();
+    clearForm();
   };
 
-  const handleEditarProducto = (index) => {
-    const producto = productos[index];
-    setNombre(producto.nombre);
-    setDetalles(producto.detalles);
-    setCategoria(producto.categoria);
-    setPrecio(producto.precio);
-    setStock(producto.stock);
-    setEditarIndex(index);
+  const handleEditClient = (index) => {
+    const client = clients[index];
+    setName(client.name);
+    setLastName(client.lastName);
+    setDirection(client.direction);
+    setEmail(client.email);
+    setDni(client.dni);
+    setEditingIndex(index);
   };
 
-  const handleEliminarProducto = (index) => {
-    const productosActualizados = [...productos];
-    productosActualizados.splice(index, 1);
-    setProductos(productosActualizados);
+  const handleDeleteClient = (index) => {
+    const updatedClients = [...clients];
+    updatedClients.splice(index, 1);
+    setClients(updatedClients);
   };
 
-  const limpiarFormulario = () => {
-    setNombre("");
-    setDetalles("");
-    setCategoria("");
-    setPrecio("");
-    setStock("");
-    setEditarIndex(null);
+  const clearForm = () => {
+    setName("");
+    setLastName("");
+    setDirection("");
+    setEmail("");
+    setDni("");
+    setEditingIndex(null);
   };
 
   return (
     <div className="Container">
-      <h1 className="Formulario">Agregar Producto</h1>
+      <h1 className="Formulario">Agregar Cliente</h1>
 
-      <form onSubmit={handleAgregarProducto} className="formulario-form">
+      <form onSubmit={handleAddClient} className="formulario-form">
         <div className="formulario-form-group">
           <label className="formulario-label">Nombre:</label>
           <input
             type="text"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="formulario-input"
           />
         </div>
 
         <div className="formulario-form-group">
-          <label className="formulario-label">Detalles:</label>
+          <label className="formulario-label">Apellido:</label>
           <input
             type="text"
-            value={detalles}
-            onChange={(e) => setDetalles(e.target.value)}
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             className="formulario-input"
           />
         </div>
 
         <div className="formulario-form-group">
-          <label className="formulario-label">Categoría:</label>
+          <label className="formulario-label">Dirección:</label>
           <input
             type="text"
-            value={categoria}
-            onChange={(e) => setCategoria(e.target.value)}
+            value={direction}
+            onChange={(e) => setDirection(e.target.value)}
             className="formulario-input"
           />
         </div>
 
         <div className="formulario-form-group">
-          <label className="formulario-label">Precio:</label>
+          <label className="formulario-label">Email:</label>
           <input
-            type="number"
-            value={precio}
-            onChange={(e) => setPrecio(e.target.value)}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="formulario-input"
           />
         </div>
 
         <div className="formulario-form-group">
-          <label className="formulario-label">Stock:</label>
+          <label className="formulario-label">DNI:</label>
           <input
-            type="number"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
+            type="text"
+            value={dni}
+            onChange={(e) => setDni(e.target.value)}
             className="formulario-input"
           />
 
           <button type="submit" className="formulario-button">
-            {editarIndex !== null ? "Actualizar Producto" : "Agregar Producto"}
+            {editingIndex !== null ? "Actualizar Cliente" : "Agregar Cliente"}
           </button>
         </div>
       </form>
 
-      <ul className="formulario-product-list">
-        {productos.map((producto, index) => (
-          <li key={index} className="formulario-product-item">
-            <h3>{producto.nombre}</h3>
-            <p>{producto.detalles}</p>
-            <p>{producto.categoria}</p>
-            <p>Precio: {producto.precio}</p>
-            <p>Stock: {producto.stock}</p>
+      <ul className="formulario-client-list">
+        {clients.map((client, index) => (
+          <li key={client.id} className="formulario-client-item">
+            <h3>Nombre: {client.name}</h3>
+            <p>Apellido: {client.lastName}</p>
+            <p>Dirección: {client.direction}</p>
+            <p>Email: {client.email}</p>
+            <p>DNI: {client.dni}</p>
+            {client.images && client.images.length > 0 && (
+              <img
+                src={client.images[0].url}
+                alt="Cliente"
+                className="formulario-client-image"
+              />
+            )}
             <button
-              onClick={() => handleEditarProducto(index)}
+              onClick={() => handleEditClient(index)}
               className="formulario-edit-button"
             >
               Editar
             </button>
             <button
-              onClick={() => handleEliminarProducto(index)}
+              onClick={() => handleDeleteClient(index)}
               className="formulario-delete-button"
             >
               Eliminar
@@ -162,4 +177,4 @@ const Formulario = () => {
   );
 };
 
-export default Formulario;
+export default Form;

@@ -1,25 +1,18 @@
-import logo from "./logo.svg";
-import "./App.css";
+import React from 'react';
+import ProductTable from './componets/ProductTable';
+import ClientsTable from './componets/ClientsTable';
+import Form from './componets/AddUserForm';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> Hola
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Form/>
+      <h1>Product List</h1>
+      <ProductTable />
+      <h1>Client List</h1>
+      <ClientsTable />
     </div>
   );
-}
+};
 
 export default App;

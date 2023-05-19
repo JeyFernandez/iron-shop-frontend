@@ -11,10 +11,10 @@ const Form = () => {
   const [editingIndex, setEditingIndex] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:3001/client')
-      .then(response => response.json())
-      .then(data => setClients(data))
-      .catch(error => console.error(error));
+    fetch("http://localhost:3001/client")
+      .then((response) => response.json())
+      .then((data) => setClients(data))
+      .catch((error) => console.error(error));
   }, []);
 
   const handleAddClient = (e) => {
@@ -33,7 +33,7 @@ const Form = () => {
 
     if (editingIndex !== null) {
       const updatedClients = [...clients];
-      updatedClients[editingIndex] = {
+      const updatedClient = {
         id: clients[editingIndex].id,
         name,
         lastName,
@@ -41,8 +41,23 @@ const Form = () => {
         email,
         dni,
       };
-      setClients(updatedClients);
-      setEditingIndex(null);
+
+      // Actualizar el cliente en la base de datos mediante una solicitud PUT o PATCH
+      fetch(`http://localhost:3001/client/${updatedClient.id}`, {
+        method: "PUT", // o "PATCH" dependiendo de tu API
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedClient),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Actualizar el arreglo de clientes con la respuesta del servidor
+          updatedClients[editingIndex] = data;
+          setClients(updatedClients);
+          setEditingIndex(null);
+        })
+        .catch((error) => console.error(error));
     } else {
       const newClient = {
         name,
@@ -52,27 +67,96 @@ const Form = () => {
         dni,
       };
 
-      setClients([...clients, newClient]);
+      // Agregar el nuevo cliente a la base de datos mediante una solicitud POST
+      fetch("http://localhost:3001/client", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newClient),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Agregar el nuevo cliente al arreglo de clientes con la respuesta del servidor
+          setClients([...clients, data]);
+        })
+        .catch((error) => console.error(error));
     }
 
     clearForm();
   };
 
   const handleEditClient = (index) => {
-    const client = clients[index];
-    setName(client.name);
-    setLastName(client.lastName);
-    setDirection(client.direction);
-    setEmail(client.email);
-    setDni(client.dni);
+    const clientToEdit = clients[index];
+    setName(clientToEdit.name);
+    setLastName(clientToEdit.lastName);
+    setDirection(clientToEdit.direction);
+    setEmail(clientToEdit.email);
+    setDni(clientToEdit.dni);
     setEditingIndex(index);
   };
 
-  const handleDeleteClient = (index) => {
-    const updatedClients = [...clients];
-    updatedClients.splice(index, 1);
-    setClients(updatedClients);
+  const handleUpdateClient = (e) => {
+    e.preventDefault();
+
+    if (
+      name.trim() === "" ||
+      lastName.trim() === "" ||
+      direction.trim() === "" ||
+      email.trim() === "" ||
+      dni.trim() === ""
+    ) {
+      alert("Por favor, completa todos los campos.");
+      return;
+    }
+
+    if (editingIndex !== null) {
+      const updatedClients = [...clients];
+      const clientToUpdate = {
+        id: clients[editingIndex].id,
+        name,
+        lastName,
+        direction,
+        email,
+        dni,
+      };
+
+      // Actualizar el cliente en la base de datos mediante una solicitud PUT o PATCH
+      fetch(`http://localhost:3001/client/${clientToUpdate.id}`, {
+        method: "PUT", // o "PATCH" dependiendo de tu API
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(clientToUpdate),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Actualizar el arreglo de clientes con la respuesta del servidor
+          updatedClients[editingIndex] = data;
+          setClients(updatedClients);
+          setEditingIndex(null);
+          clearForm();
+        })
+        .catch((error) => console.error(error));
+    }
   };
+
+  const handleDeleteClient = (index) => {
+    const clientToDelete = clients[index];
+  
+    // Eliminar el cliente de la base de datos mediante una solicitud DELETE
+    fetch(`http://localhost:3001/client/${clientToDelete.id}`, {
+      method: "DELETE",
+    })
+      .then(() => {
+        // Actualizar el arreglo de clientes eliminando el cliente correspondiente
+        const updatedClients = [...clients];
+        updatedClients.splice(index, 1);
+        setClients(updatedClients);
+      })
+      .catch((error) => console.error(error));
+  };
+  
 
   const clearForm = () => {
     setName("");
@@ -143,36 +227,51 @@ const Form = () => {
         </div>
       </form>
 
-      <ul className="formulario-client-list">
-        {clients.map((client, index) => (
-          <li key={client.id} className="formulario-client-item">
-            <h3>Nombre: {client.name}</h3>
-            <p>Apellido: {client.lastName}</p>
-            <p>Dirección: {client.direction}</p>
-            <p>Email: {client.email}</p>
-            <p>DNI: {client.dni}</p>
-            {client.images && client.images.length > 0 && (
-              <img
-                src={client.images[0].url}
-                alt="Cliente"
-                className="formulario-client-image"
-              />
-            )}
+      <table className="formulario-client-table">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Apellido</th>
+      <th>Dirección</th>
+      <th>Email</th>
+      <th>DNI</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {clients.map((clientItem, index) => (
+      <tr key={clientItem.id} className="formulario-client-row">
+        <td>{clientItem.name}</td>
+        <td>{clientItem.lastName}</td>
+        <td>{clientItem.direction}</td>
+        <td>{clientItem.email}</td>
+        <td>{clientItem.dni}</td>
+        <td>
+          {clientItem.images && clientItem.images.length > 0 && (
+            <img
+              src={clientItem.images[0].url}
+              alt="Cliente"
+              className="formulario-client-image"
+            />
+          )}
             <button
-              onClick={() => handleEditClient(index)}
-              className="formulario-edit-button"
+              onClick={(e) => handleUpdateClient(e)}
+              className="formulario-update-button"
             >
-              Editar
+              Actualizar
             </button>
-            <button
+          <button
               onClick={() => handleDeleteClient(index)}
               className="formulario-delete-button"
             >
               Eliminar
             </button>
-          </li>
-        ))}
-      </ul>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
     </div>
   );
 };

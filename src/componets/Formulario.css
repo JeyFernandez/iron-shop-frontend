@@ -1,11 +1,8 @@
 .Formulario {
   color: brown;
-  text-align: center;
 }
 
 .Container {
-  justify-content: center;
-  width: 40%;
   margin: auto;
 }
 
@@ -17,7 +14,6 @@
   margin-bottom: 10px;
   width: 100%;
   margin: auto;
-  justify-content: center;
 }
 
 .formulario-label {
@@ -44,6 +40,7 @@
 }
 
 .formulario-product-list {
+  display: flex;
   list-style: none;
   padding: 0;
   margin: auto;
@@ -57,6 +54,12 @@
 
 .formulario-edit-button {
   margin-right: 5px;
+  margin-right: 5px;
+  background-color: blue;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .formulario-delete-button {
@@ -66,4 +69,35 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+table {
+  font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+  font-size: 12px;
+  margin: 45px;
+  width: 480px;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+th {
+  font-size: 13px;
+  font-weight: normal;
+  padding: 8px;
+  background: #b9c9fe;
+  border-top: 4px solid #aabcfe;
+  border-bottom: 1px solid #fff;
+  color: #039;
+}
+
+td {
+  padding: 8px;
+  background: #e8edff;
+  border-bottom: 1px solid #fff;
+  color: #669;
+  border-top: 1px solid transparent;
+}
+
+tr:hover td {
+  background: #d0dafd;
+  color: #339;
 }
